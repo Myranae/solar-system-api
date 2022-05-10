@@ -5,12 +5,19 @@ class Planet(db.Model):
     name = db.Column(db.String)
     description = db.Column(db.String)
     color = db.Column(db.String)
+    moons = db.relationship("Moon", back_populates="planet")
 
     def to_dict(self):
         return {
-            "id": self.id,
+            "planet_id": self.id,
             "name": self.name,
             "description": self.description,
-            "color": self.color
+            "color": self.color,
+            "moons": self.moons
         }
 
+    @classmethod
+    def from_dict(cls, data_dict):
+        return Planet(
+            name=data_dict["name"]
+        )

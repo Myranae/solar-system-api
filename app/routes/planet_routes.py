@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, abort, make_response, request
 from app import db
 from app.models.planet import Planet
+from app.models.moon import Moon
 
 bp = Blueprint("planets", __name__, url_prefix="/planets")
 
@@ -91,3 +92,21 @@ def update_planet(planet_id):
     db.session.commit()
 
     return make_response(jsonify(f"Planet {planet_id} was successfully replaced."))
+
+# NESTED ROUTES
+@bp.route("/<planet_id>/moons", methods=["POST"])
+def create_moon(planet_id):
+    request_body = request.get_json()
+    planet = validate_planet(planet_id)
+
+    new_moon = Moon(
+        name = request_body["name"],
+        description = request_body["description"],
+        size = request_body["size"],
+        planet = planet
+    )
+
+    db.session.add(new_moon)
+    db.session.commit()
+
+    return make_response(jsonify(f"Moon {new_moon.name} successfully created"), 201)
